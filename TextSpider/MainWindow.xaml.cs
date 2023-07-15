@@ -20,10 +20,10 @@ using Microsoft.UI.Dispatching;
 using WinRT;
 using System.Runtime.InteropServices;
 using System.Text;
-using Windows.Storage.Streams;
 using TextSpider.ViewModels;
 using Windows.Storage.FileProperties;
 using CommunityToolkit.WinUI.UI.Controls;
+using TextSpider.Utility;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -33,6 +33,7 @@ using CommunityToolkit.WinUI.UI.Controls;
 // TODO: Refactor code to different files.
 // TODO: Add regular expression.
 // TODO: Add replace function.
+// TODO: Implement sorting for datagrid.
 namespace TextSpider
 {
     public sealed partial class MainWindow : Window
@@ -102,7 +103,7 @@ namespace TextSpider
             try
             {
                 BindingContext.SearchResults.Clear();
-                if (IsFolderPath(BindingContext.InputFilePath))
+                if (FileHelper.IsFolderPath(BindingContext.InputFilePath))
                 {
                     StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(BindingContext.InputFilePath);
                     await GetFilesFromFolder(folder);
@@ -192,33 +193,13 @@ namespace TextSpider
                 FilePath = file.Path,
                 FileType = file.DisplayType,
                 Matches = matches,
-                FileSize = FormatFileSize(properties.Size),
+                FileSize = FileHelper.FormatFileSize(properties.Size),
                 Created = properties.ItemDate,
                 Modified = properties.DateModified,
                 Attributes = file.Attributes.ToString(),
                 Results = str.ToString()
             };
             BindingContext.SearchResults.Add(fileInformation);
-        }
-
-        public string FormatFileSize(ulong fileSize)
-        {
-            string[] sizeSuffixes = { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
-
-            if (fileSize == 0)
-                return "0 " + sizeSuffixes[0];
-
-            int suffixIndex = (int)(Math.Log(fileSize, 1024));
-            double normalizedSize = fileSize / Math.Pow(1024, suffixIndex);
-            string formattedSize = $"{normalizedSize:0.##} {sizeSuffixes[suffixIndex]}";
-
-            return formattedSize;
-        }
-
-        public bool IsFolderPath(string path)
-        {
-            System.IO.FileAttributes attributes = File.GetAttributes(path);
-            return (attributes & System.IO.FileAttributes.Directory) == System.IO.FileAttributes.Directory;
         }
         #endregion
     }
