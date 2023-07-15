@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TextSpider (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "TextSpider (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
