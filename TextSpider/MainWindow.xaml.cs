@@ -35,14 +35,12 @@ namespace TextSpider
     public sealed partial class MainWindow : Window
     {
         MainViewModel BindingContext { get; set; }
-        bool isInputFolder { get; set; }
         List<FileInformation> SearchResults = new List<FileInformation>();
         public MainWindow()
         {
             this.InitializeComponent();
             this.Title = "TextSpider";
             this.BindingContext = new MainViewModel();
-            this.isInputFolder = false;
         }
 
         private void HandleInputOptionChange(object sender, RoutedEventArgs e)
@@ -56,13 +54,11 @@ namespace TextSpider
             {
                 FolderInputGrid.Visibility = Visibility.Visible;
                 FileInputGrid.Visibility = Visibility.Collapsed;
-                this.isInputFolder = true;
             }
             else if (selectedOption == "InputFromFile")
             {
                 FolderInputGrid.Visibility = Visibility.Collapsed;
                 FileInputGrid.Visibility = Visibility.Visible;
-                this.isInputFolder = false;
             }
         }
 
