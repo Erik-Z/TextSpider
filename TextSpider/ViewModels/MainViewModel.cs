@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace TextSpider.ViewModels
 {
@@ -47,6 +49,20 @@ namespace TextSpider.ViewModels
                 if (_replaceValue != value)
                 {
                     _replaceValue = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<FileInformation> _searchResults = new ObservableCollection<FileInformation>();
+        public ObservableCollection<FileInformation> SearchResults
+        {
+            get { return _searchResults; }
+            set
+            {
+                if (_searchResults != value)
+                {
+                    _searchResults = value;
                     OnPropertyChanged();
                 }
             }

@@ -3,9 +3,9 @@
     x:Class="TextSpider.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:TextSpider"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d">
 
     <Grid>
@@ -149,7 +149,28 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0"></StackPanel>
+            <ctWinUI:DataGrid Grid.Row="0" Height="200" AutoGenerateColumns="False" IsReadOnly="True"
+                              ItemsSource="{x:Bind BindingContext.SearchResults, Mode=OneWay}" 
+                              SelectionMode="Single" SelectionChanged="HandleSelectedResultChange">
+                <ctWinUI:DataGrid.Columns>
+                    <ctWinUI:DataGridTextColumn Header="File Name" Width="SizeToHeader" 
+                                                Binding="{Binding FileName}" />
+                    <ctWinUI:DataGridTextColumn Header="Path" Width="SizeToHeader" 
+                                                Binding="{Binding FilePath}" />
+                    <ctWinUI:DataGridTextColumn Header="Matches" Width="SizeToHeader" 
+                                                Binding="{Binding Matches}" />
+                    <ctWinUI:DataGridTextColumn Header="File Size" Width="SizeToHeader" 
+                                                Binding="{Binding FileSize}" />
+                    <ctWinUI:DataGridTextColumn Header="Modified" Width="SizeToHeader" 
+                                                Binding="{Binding Modified}" />
+                    <ctWinUI:DataGridTextColumn Header="File Type" Width="SizeToHeader" 
+                                                Binding="{Binding FileType}" />
+                    <ctWinUI:DataGridTextColumn Header="Encoding" Width="SizeToHeader" 
+                                                Binding="{Binding Encoding}" />
+                    <ctWinUI:DataGridTextColumn Header="Attributes" Width="SizeToHeader" 
+                                                Binding="{Binding Attributes}" />
+                </ctWinUI:DataGrid.Columns>
+            </ctWinUI:DataGrid>
             <RichEditBox Grid.Row="1" x:Name="ResultsRichEditBox" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
         </Grid>
     </Grid>

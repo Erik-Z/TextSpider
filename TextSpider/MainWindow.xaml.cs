@@ -22,20 +22,22 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Windows.Storage.Streams;
 using TextSpider.ViewModels;
-using static System.Net.Mime.MediaTypeNames;
-using System.ComponentModel;
 using Windows.Storage.FileProperties;
+using CommunityToolkit.WinUI.UI.Controls;
 
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
-
+// TODO: Fix Open File Error Alert.
+// TODO: Add file filter for files.
+// TODO: Refactor code to different files.
+// TODO: Add regular expression.
+// TODO: Add replace function.
 namespace TextSpider
 {
     public sealed partial class MainWindow : Window
     {
         MainViewModel BindingContext { get; set; }
-        List<FileInformation> SearchResults = new List<FileInformation>();
         public MainWindow()
         {
             this.InitializeComponent();
@@ -99,7 +101,7 @@ namespace TextSpider
         {
             try
             {
-                SearchResults.Clear();
+                BindingContext.SearchResults.Clear();
                 if (IsFolderPath(BindingContext.InputFilePath))
                 {
                     StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(BindingContext.InputFilePath);
@@ -110,11 +112,11 @@ namespace TextSpider
                     StorageFile file = await StorageFile.GetFileFromPathAsync(BindingContext.InputFilePath);
                     await FindValueInFile(file, BindingContext.FindValue);
                 }
-                if (SearchResults.Count == 1)
+                if (BindingContext.SearchResults.Count == 1)
                 {
-                    ResultsRichEditBox.Document.SetText(TextSetOptions.FormatRtf, SearchResults[0].Results);
+                    ResultsRichEditBox.Document.SetText(TextSetOptions.FormatRtf, BindingContext.SearchResults[0].Results);
                 }
-                Console.WriteLine(SearchResults.ToString());
+                Console.WriteLine(BindingContext.SearchResults.ToString());
             }
             catch (Exception ex)
             {
@@ -126,6 +128,16 @@ namespace TextSpider
                 };
 
                 await noWifiDialog.ShowAsync();
+            }
+        }
+
+        private void HandleSelectedResultChange(object sender, RoutedEventArgs e)
+        {
+            if (sender is DataGrid dataGrid)
+            {
+                FileInformation selectedItem = (FileInformation)dataGrid.SelectedItem;
+                if (selectedItem == null) return;
+                ResultsRichEditBox.Document.SetText(TextSetOptions.FormatRtf, selectedItem.Results);
             }
         }
 
@@ -186,8 +198,7 @@ namespace TextSpider
                 Attributes = file.Attributes.ToString(),
                 Results = str.ToString()
             };
-            SearchResults.Add(fileInformation);
-            // ResultsRichEditBox.Document.SetText(TextSetOptions.FormatRtf, str.ToString());
+            BindingContext.SearchResults.Add(fileInformation);
         }
 
         public string FormatFileSize(ulong fileSize)
