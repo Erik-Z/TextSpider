@@ -24,6 +24,8 @@ using TextSpider.ViewModels;
 using Windows.Storage.FileProperties;
 using CommunityToolkit.WinUI.UI.Controls;
 using TextSpider.Utility;
+using Windows.UI.Core;
+using TextSpider.Services;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -34,16 +36,20 @@ using TextSpider.Utility;
 // TODO: Add regular expression.
 // TODO: Add replace function.
 // TODO: Implement sorting for datagrid.
+// TODO: Add more file filters for pick single file.
 namespace TextSpider
 {
-    public sealed partial class MainWindow : Window
+    public partial class MainWindow : Window
     {
         MainViewModel BindingContext { get; set; }
+        FileService FileService { get; set; }
         public MainWindow()
         {
             this.InitializeComponent();
             this.Title = "TextSpider";
             this.BindingContext = new MainViewModel();
+
+            FileService = new FileService();
         }
 
         private void HandleInputOptionChange(object sender, RoutedEventArgs e)
@@ -67,33 +73,16 @@ namespace TextSpider
 
         private async void LoadFileFromFileExplorer(object sender, RoutedEventArgs e)
         {
-            var filePicker = new FileOpenPicker();
-
-            var hwnd = this.As<IWindowNative>().WindowHandle;
-
-            var initializeWithWindow = filePicker.As<IInitializeWithWindow>();
-            initializeWithWindow.Initialize(hwnd);
-            filePicker.FileTypeFilter.Add("*");
-            filePicker.FileTypeFilter.Add(".txt");
-            filePicker.ViewMode = PickerViewMode.List;
-            filePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-            
-            StorageFile file = await filePicker.PickSingleFileAsync();
+            var hwnd = this.As<IWindowNative>().WindowHandle;   
+            StorageFile file = await FileService.PickSingleFileAsync(hwnd);
             if (file == null) return; 
             BindingContext.InputFilePath = file.Path;
         }
 
         private async void LoadFolderFromFileExplorer(object sender, RoutedEventArgs e)
         {
-            var folderPicker = new FolderPicker();
-
             var hwnd = this.As<IWindowNative>().WindowHandle;
-
-            var initializeWithWindow = folderPicker.As<IInitializeWithWindow>();
-            initializeWithWindow.Initialize(hwnd);
-            folderPicker.SuggestedStartLocation = PickerLocationId.Desktop;
-
-            StorageFolder folder = await folderPicker.PickSingleFolderAsync();
+            StorageFolder folder = await FileService.PickSingleFolderAsync(hwnd);
             if (folder == null) return;
             BindingContext.InputFilePath = folder.Path;
         }
@@ -117,18 +106,18 @@ namespace TextSpider
                 {
                     ResultsRichEditBox.Document.SetText(TextSetOptions.FormatRtf, BindingContext.SearchResults[0].Results);
                 }
-                Console.WriteLine(BindingContext.SearchResults.ToString());
             }
             catch (Exception ex)
             {
-                ContentDialog noWifiDialog = new ContentDialog()
+                ContentDialog InvalidFilePathDialog = new ContentDialog()
                 {
-                    Title = "No wifi connection",
-                    Content = "Check connection and try again.",
-                    CloseButtonText = "Ok"
+                    Title = "Invalid File Path",
+                    Content = "File is not found at current file path. Please select a new one and try again.",
+                    CloseButtonText = "Ok",
+                    XamlRoot = ResultsRichEditBox.XamlRoot
                 };
 
-                await noWifiDialog.ShowAsync();
+                await InvalidFilePathDialog.ShowAsync();
             }
         }
 
