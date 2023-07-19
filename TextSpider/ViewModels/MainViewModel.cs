@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using TextSpider.Models;
 
 namespace TextSpider.ViewModels
 {
@@ -67,6 +68,11 @@ namespace TextSpider.ViewModels
                 }
             }
         }
+
+
+
+
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 

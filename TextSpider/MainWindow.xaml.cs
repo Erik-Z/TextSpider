@@ -26,11 +26,11 @@ using CommunityToolkit.WinUI.UI.Controls;
 using TextSpider.Utility;
 using Windows.UI.Core;
 using TextSpider.Services;
+using TextSpider.Models;
 
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
-// TODO: Fix Open File Error Alert.
 // TODO: Add file filter for files.
 // TODO: Refactor code to different files.
 // TODO: Add regular expression.
@@ -107,7 +107,7 @@ namespace TextSpider
                     ResultsRichEditBox.Document.SetText(TextSetOptions.FormatRtf, BindingContext.SearchResults[0].Results);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ContentDialog InvalidFilePathDialog = new ContentDialog()
                 {
@@ -154,12 +154,22 @@ namespace TextSpider
         {
             IList<string> lines = await FileIO.ReadLinesAsync(file);
             StringBuilder str = new StringBuilder();
-            str.AppendLine(@"{\rtf1\ansi\deff0{\colortbl;\red0\green0\blue0;\red255\green255\blue0;\red255\green0\blue0;}");
+            int totalLines = lines.Count;
+            int maxDigits = totalLines.ToString().Length;
+            str.AppendLine(@"{\rtf1\ansi\deff0\tqr\tx" + (maxDigits * 10).ToString() + @"{\colortbl;\red0\green0\blue0;\red255\green255\blue0;\red255\green0\blue0;\red192\green192\blue192;}");
+
             int matches = 0;
-            foreach (string line in lines)
+            
+            for (int i = 0; i < totalLines; i++)
             {
+                string line = lines[i];
                 if (!line.Contains(value) || value == "") continue;
                 matches++;
+
+                str.Append(@"\tab\cf1\highlight0 ");
+                str.Append((i + 1).ToString());
+                str.Append("\t");
+
                 int start = 0;
                 int found = -1;
                 while ((found = line.IndexOf(value, start)) != -1)

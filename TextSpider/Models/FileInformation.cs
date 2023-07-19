@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TextSpider.ViewModels
+namespace TextSpider.Models
 {
     public class FileInformation
     {
@@ -12,7 +12,7 @@ namespace TextSpider.ViewModels
         public string FileType { get; set; }
         public string FilePath { get; set; }
         public int Matches { get; set; }
-        public string FileSize {get; set;}
+        public string FileSize { get; set; }
         public DateTimeOffset Created { get; set; }
         public DateTimeOffset Modified { get; set; }
         public string Encoding { get; set; }
