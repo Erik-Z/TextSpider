@@ -55,6 +55,19 @@ namespace TextSpider.ViewModels
             }
         }
 
+        private string _isFindByRegex;
+        public string IsFindByRegex
+        {
+            get { return _isFindByRegex; }
+            set
+            {
+                if (_isFindByRegex != value)
+                {
+                    _isFindByRegex = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         private ObservableCollection<FileInformation> _searchResults = new ObservableCollection<FileInformation>();
         public ObservableCollection<FileInformation> SearchResults
         {

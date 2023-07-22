@@ -27,6 +27,7 @@ using TextSpider.Utility;
 using Windows.UI.Core;
 using TextSpider.Services;
 using TextSpider.Models;
+using TextSpider.Interfaces;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -43,6 +44,7 @@ namespace TextSpider
     {
         MainViewModel BindingContext { get; set; }
         FileService FileService { get; set; }
+        private IDialogService DialogService;
         public MainWindow()
         {
             this.InitializeComponent();
@@ -50,6 +52,10 @@ namespace TextSpider
             this.BindingContext = new MainViewModel();
 
             FileService = new FileService();
+        }
+        private void HandleMainWindowLoaded(object sender, RoutedEventArgs e)
+        {
+            DialogService = new DialogService(MainWindowGrid.XamlRoot);
         }
 
         private void HandleInputOptionChange(object sender, RoutedEventArgs e)
@@ -109,15 +115,10 @@ namespace TextSpider
             }
             catch (Exception)
             {
-                ContentDialog InvalidFilePathDialog = new ContentDialog()
-                {
-                    Title = "Invalid File Path",
-                    Content = "File is not found at current file path. Please select a new one and try again.",
-                    CloseButtonText = "Ok",
-                    XamlRoot = ResultsRichEditBox.XamlRoot
-                };
-
-                await InvalidFilePathDialog.ShowAsync();
+                await DialogService.ShowDialogAsync(
+                    "Invalid File Path",
+                    "File is not found at current file path. Please select a new one and try again.",
+                    "Ok");
             }
         }
 
