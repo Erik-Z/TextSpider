@@ -49,7 +49,9 @@ namespace TextSpider
         {
             this.InitializeComponent();
             this.Title = "TextSpider";
+            
             this.BindingContext = new MainViewModel();
+            Menu.BindingContext = BindingContext;
 
             FileService = new FileService();
         }

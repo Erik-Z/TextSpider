@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls" xmlns:components="using:TextSpider.Components"
     mc:Ignorable="d">
 
     <Grid x:Name="MainWindowGrid" Loaded="HandleMainWindowLoaded">
@@ -19,22 +19,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- Menu -->
-        <MenuBar Grid.ColumnSpan="2">
-            <MenuBarItem Title="File">
-                <MenuFlyoutItem Text="New" />
-                <MenuFlyoutItem Text="Open..." />
-                <MenuFlyoutItem Text="Save" />
-                <MenuFlyoutSeparator />
-                <MenuFlyoutItem Text="Exit"/>
-            </MenuBarItem>
-            <MenuBarItem Title="View">
-                <!-- Add your menu items here -->
-            </MenuBarItem>
-            <MenuBarItem Title="Edit">
-                <!-- Add your menu items here -->
-            </MenuBarItem>
-        </MenuBar>
+        <components:Menu Grid.ColumnSpan="2" x:Name="Menu"/>
 
         <!-- Sidebar -->
         <StackPanel Grid.Column="0" Grid.Row="1" Background="{ThemeResource SystemControlBackgroundAccentBrush}">
