@@ -29,6 +29,7 @@ using TextSpider.Services;
 using TextSpider.Models;
 using TextSpider.Interfaces;
 using TextSpider.Components;
+using System.Text.RegularExpressions;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -77,7 +78,14 @@ namespace TextSpider
                 } else
                 {
                     StorageFile file = await StorageFile.GetFileFromPathAsync(BindingContext.InputFilePath);
-                    await FindValueInFile(file, BindingContext.FindValue);
+                    if (BindingContext.IsFindByRegex)
+                    {
+                        await MatchRegexPatternInFile(file, BindingContext.GetRegexValue());
+                    }
+                    else
+                    {
+                        await FindValueInFile(file, BindingContext.FindValue);
+                    }
                 }
                 if (BindingContext.SearchResults.Count == 1)
                 {
@@ -103,6 +111,27 @@ namespace TextSpider
             }
         }
 
+        private void HandleFindReplaceOptionsChange(object sender, RoutedEventArgs e)
+        {
+            if (FindGrid == null || RegexGrid == null) return;
+
+            RadioButton radioButton = (RadioButton)sender;
+            string selectedOption = radioButton.Name.ToString();
+
+            if (selectedOption == "FindRadioButton")
+            {
+                FindGrid.Visibility = Visibility.Visible;
+                RegexGrid.Visibility = Visibility.Collapsed;
+                BindingContext.IsFindByRegex = false;
+            }
+            else if (selectedOption == "RegexRadioButton")
+            {
+                FindGrid.Visibility = Visibility.Collapsed;
+                RegexGrid.Visibility = Visibility.Visible;
+                BindingContext.IsFindByRegex = true;
+            }
+        }
+
         private async void ReplaceValueInFilePath(object sender, RoutedEventArgs e)
         {
 
@@ -114,7 +143,14 @@ namespace TextSpider
             var files = await folder.GetFilesAsync();
             foreach (var file in files)
             {
-                await FindValueInFile(file, BindingContext.FindValue);
+                if (BindingContext.IsFindByRegex)
+                {
+                    await MatchRegexPatternInFile(file, BindingContext.GetRegexValue());
+                } else
+                {
+                    await FindValueInFile(file, BindingContext.FindValue);
+                }
+                
             }
             foreach (StorageFolder subfolder in await folder.GetFoldersAsync())
             {
@@ -154,6 +190,60 @@ namespace TextSpider
                 }
                 str.Append(line.Substring(start));
                 str.AppendLine(@"\par");
+            }
+            str.AppendLine("}");
+
+            BasicProperties properties = await file.GetBasicPropertiesAsync();
+            FileInformation fileInformation = new FileInformation
+            {
+                FileName = file.Name,
+                FilePath = file.Path,
+                FileType = file.DisplayType,
+                Matches = matches,
+                FileSize = FileHelper.FormatFileSize(properties.Size),
+                Created = properties.ItemDate,
+                Modified = properties.DateModified,
+                Attributes = file.Attributes.ToString(),
+                Results = str.ToString()
+            };
+            BindingContext.SearchResults.Add(fileInformation);
+        }
+
+        private async Task MatchRegexPatternInFile(StorageFile file, Regex pattern)
+        {
+            IList<string> lines = await FileIO.ReadLinesAsync(file);
+            StringBuilder str = new StringBuilder();
+            int totalLines = lines.Count;
+            int maxDigits = totalLines.ToString().Length;
+            str.AppendLine(@"{\rtf1\ansi\deff0\tqr\tx" + (maxDigits * 10).ToString() + @"{\colortbl;\red0\green0\blue0;\red255\green255\blue0;\red255\green0\blue0;\red192\green192\blue192;}");
+
+            int matches = 0;
+
+            for (int i = 0; i < totalLines; i++)
+            {
+                string line = lines[i];
+                MatchCollection matchCollection = pattern.Matches(line);
+
+                if (matchCollection.Count > 0)
+                {
+                    matches += matchCollection.Count;
+
+                    str.Append(@"\tab\cf1\highlight0 ");
+                    str.Append((i + 1).ToString());
+                    str.Append("\t");
+
+                    int start = 0;
+                    foreach (Match match in matchCollection)
+                    {
+                        str.Append(line.Substring(start, match.Index - start));
+                        str.Append(@"\cf3\highlight2 ");
+                        str.Append(line.Substring(match.Index, match.Length));
+                        str.Append(@"\cf1\highlight0 ");
+                        start = match.Index + match.Length;
+                    }
+                    str.Append(line.Substring(start));
+                    str.AppendLine(@"\par");
+                }
             }
             str.AppendLine("}");
 

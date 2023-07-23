@@ -5,9 +5,11 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using TextSpider.Models;
+using TextSpider.Services;
 
 namespace TextSpider.ViewModels
 {
@@ -27,7 +29,7 @@ namespace TextSpider.ViewModels
             }
         }
 
-        private string _findValue = "Test";
+        private string _findValue;
         public string FindValue
         {
             get { return _findValue; }
@@ -40,6 +42,31 @@ namespace TextSpider.ViewModels
                 }
             }
         }
+
+        private Regex _regexValue = new Regex("([A-Z])\\w+");
+        public string RegexValue
+        {
+            get { return _regexValue.ToString(); }
+            set
+            {
+                try { 
+                    if (_regexValue.ToString() != value)
+                    {
+                        _regexValue = new Regex(value);
+                        OnPropertyChanged();
+                    }
+                } catch(Exception) 
+                {
+                    return;
+                }
+            }
+        }
+
+        public Regex GetRegexValue()
+        {
+            return _regexValue;
+        }
+
 
         private string _replaceValue;
         public string ReplaceValue
@@ -55,8 +82,8 @@ namespace TextSpider.ViewModels
             }
         }
 
-        private string _isFindByRegex;
-        public string IsFindByRegex
+        private bool _isFindByRegex;
+        public bool IsFindByRegex
         {
             get { return _isFindByRegex; }
             set
@@ -81,11 +108,6 @@ namespace TextSpider.ViewModels
                 }
             }
         }
-
-
-
-
-
 
         public event PropertyChangedEventHandler PropertyChanged;
 
