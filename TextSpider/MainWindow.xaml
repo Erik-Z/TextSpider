@@ -22,64 +22,12 @@
         <components:Menu Grid.ColumnSpan="2" x:Name="Menu"/>
 
         <!-- Sidebar -->
-        <StackPanel Grid.Column="0" Grid.Row="1" Background="{ThemeResource SystemControlBackgroundAccentBrush}">
-            <Image Source="ms-appx:///Assets/StoreLogo.png" Width="100" Height="100" Margin="50,20,50,20" />
-        </StackPanel>
+        <components:Sidebar Grid.Column="0" Grid.Row="1" x:Name="Sidebar"/>
 
         <!-- Top-right corner -->
         <Grid Grid.Column="1" Grid.Row="1">
             <StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <RadioButton Content="Input from folder(s)" 
-                                 Name="InputFromFolder" 
-                                 GroupName="InputOptions" 
-                                 Checked="HandleInputOptionChange" 
-                                 Margin="10,0,10,0"/>
-
-                    <RadioButton Content="Input from a single file" 
-                                 Name="InputFromFile" 
-                                 GroupName="InputOptions" 
-                                 Checked="HandleInputOptionChange" 
-                                 IsChecked="True" 
-                                 Margin="10,0,10,0"/>
-                </StackPanel>
-                <Grid x:Name="FileInputGrid" Visibility="Visible">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Grid.Column="0" Text="File Name" Margin="10,10,10,10" VerticalAlignment="Center"/>
-                    <TextBox Grid.Column="1" 
-                             x:Name="FileNameTextBox" 
-                             Margin="10,10,10,10" 
-                             Text="{x:Bind BindingContext.InputFilePath, Mode=TwoWay}"/>
-                    <Button Grid.Column="2" 
-                                Height="{Binding ElementName=FileNameTextBox, Path=ActualHeight}"
-                                Margin="10,10,10,10"
-                                Click="LoadFileFromFileExplorer">
-                        <Image Source="ms-appx:///Assets/File.png" Stretch="UniformToFill" />
-                    </Button>
-                </Grid>
-
-                <Grid x:Name="FolderInputGrid" Visibility="Collapsed">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Grid.Column="0" Text="Start Location:" Margin="10,10,10,10" VerticalAlignment="Center"/>
-                    <TextBox Grid.Column="1" x:Name="FolderNameTextBox" Margin="10,10,10,10" Text="{x:Bind BindingContext.InputFilePath, Mode=TwoWay}"/>
-                    <!--  ActualHeight is probably stuck at collapsed height. (Figure out how to fix later)-->
-                    <Button Grid.Column="2" 
-                                Height="{Binding ElementName=FileNameTextBox, Path=ActualHeight}"
-                                Margin="10,10,10,10"
-                                Click="LoadFolderFromFileExplorer">
-                        <Image Source="ms-appx:///Assets/folder.png" Stretch="UniformToFill" />
-                    </Button>
-                </Grid>
+                <components:FileInput x:Name="FileInput"/>
 
                 <StackPanel Orientation="Horizontal">
                     <RadioButton Content="Standard" 

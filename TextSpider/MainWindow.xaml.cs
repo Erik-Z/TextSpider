@@ -28,6 +28,7 @@ using Windows.UI.Core;
 using TextSpider.Services;
 using TextSpider.Models;
 using TextSpider.Interfaces;
+using TextSpider.Components;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -52,47 +53,15 @@ namespace TextSpider
             
             this.BindingContext = new MainViewModel();
             Menu.BindingContext = BindingContext;
+            Sidebar.BindingContext = BindingContext;
+            FileInput.BindingContext = BindingContext;
+            FileInput.window = this;
 
             FileService = new FileService();
         }
         private void HandleMainWindowLoaded(object sender, RoutedEventArgs e)
         {
             DialogService = new DialogService(MainWindowGrid.XamlRoot);
-        }
-
-        private void HandleInputOptionChange(object sender, RoutedEventArgs e)
-        {
-            if (FolderInputGrid == null || FileInputGrid == null) return;
-
-            RadioButton radioButton = (RadioButton)sender;
-            string selectedOption = radioButton.Name.ToString();
-
-            if (selectedOption == "InputFromFolder")
-            {
-                FolderInputGrid.Visibility = Visibility.Visible;
-                FileInputGrid.Visibility = Visibility.Collapsed;
-            }
-            else if (selectedOption == "InputFromFile")
-            {
-                FolderInputGrid.Visibility = Visibility.Collapsed;
-                FileInputGrid.Visibility = Visibility.Visible;
-            }
-        }
-
-        private async void LoadFileFromFileExplorer(object sender, RoutedEventArgs e)
-        {
-            var hwnd = this.As<IWindowNative>().WindowHandle;   
-            StorageFile file = await FileService.PickSingleFileAsync(hwnd);
-            if (file == null) return; 
-            BindingContext.InputFilePath = file.Path;
-        }
-
-        private async void LoadFolderFromFileExplorer(object sender, RoutedEventArgs e)
-        {
-            var hwnd = this.As<IWindowNative>().WindowHandle;
-            StorageFolder folder = await FileService.PickSingleFolderAsync(hwnd);
-            if (folder == null) return;
-            BindingContext.InputFilePath = folder.Path;
         }
 
         private async void FindValueInFilePath(object sender, RoutedEventArgs e)
@@ -204,21 +173,5 @@ namespace TextSpider
             BindingContext.SearchResults.Add(fileInformation);
         }
         #endregion
-    }
-
-    [ComImport]
-    [Guid("3E68D4BD-7135-4D10-8018-9FB6D9F33FA1")]
-    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IInitializeWithWindow
-    {
-        void Initialize(IntPtr hwnd);
-    }
-
-    [ComImport]
-    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    [Guid("EECDBF0E-BAE9-4CB6-A68E-9598E1CB57BB")]
-    internal interface IWindowNative
-    {
-        IntPtr WindowHandle { get; }
     }
 }

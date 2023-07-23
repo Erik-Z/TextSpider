@@ -12,7 +12,9 @@
     <EnableMsixTooling>true</EnableMsixTooling>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Components\FileInput.xaml" />
     <None Remove="Components\Menu.xaml" />
+    <None Remove="Components\Sidebar.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,4 +56,15 @@
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
   </PropertyGroup>
+  <ItemGroup>
+    <CustomAdditionalCompileInputs Remove="Components\Sidebar.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Remove="Components\Sidebar.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Components\FileInput.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
 </Project>

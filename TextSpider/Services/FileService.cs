@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Windows.Storage.Pickers;
 using Windows.Storage;
 using WinRT;
+using Microsoft.UI.Xaml.Controls;
 
 namespace TextSpider.Services
 {
@@ -15,8 +16,7 @@ namespace TextSpider.Services
         public async Task<StorageFile> PickSingleFileAsync(IntPtr hwnd)
         {
             var filePicker = new FileOpenPicker();
-            var initializeWithWindow = filePicker.As<IInitializeWithWindow>();
-            initializeWithWindow.Initialize(hwnd);
+            WinRT.Interop.InitializeWithWindow.Initialize(filePicker, hwnd);
             filePicker.FileTypeFilter.Add("*");
             filePicker.FileTypeFilter.Add(".txt");
             filePicker.ViewMode = PickerViewMode.List;
@@ -28,8 +28,7 @@ namespace TextSpider.Services
         public async Task<StorageFolder> PickSingleFolderAsync(IntPtr hwnd)
         {
             var folderPicker = new FolderPicker();
-            var initializeWithWindow = folderPicker.As<IInitializeWithWindow>();
-            initializeWithWindow.Initialize(hwnd);
+            WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
             folderPicker.SuggestedStartLocation = PickerLocationId.Desktop;
 
             return await folderPicker.PickSingleFolderAsync();
