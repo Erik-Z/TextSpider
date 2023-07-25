@@ -29,20 +29,7 @@
             <StackPanel>
                 <components:FileInput x:Name="FileInput"/>
 
-                <StackPanel Orientation="Horizontal">
-                    <RadioButton Content="Standard" 
-                                 GroupName="FindReplaceOptions" 
-                                 Name="FindRadioButton"
-                                 IsChecked="True"
-                                 Checked="HandleFindReplaceOptionsChange"
-                                 Margin="10,20,10,0"/>
-
-                    <RadioButton Content="Regular Expression" 
-                                 GroupName="FindReplaceOptions"
-                                 Name="RegexRadioButton"
-                                 Checked="HandleFindReplaceOptionsChange"
-                                 Margin="10,20,10,0"/>
-                </StackPanel>
+                <components:StandardRegexRadioButtons />
 
                 <Grid>
                     <Grid.RowDefinitions>
@@ -53,7 +40,8 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="200" />
                     </Grid.ColumnDefinitions>
-                    <Grid x:Name="FindGrid" Grid.Row="0" Grid.Column="0">
+                    <Grid x:Name="FindGrid" Grid.Row="0" Grid.Column="0"
+                          Visibility="{x:Bind RadioButtonContext.IsNotFindByRegex, Mode=OneWay}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
@@ -63,7 +51,8 @@
                         <TextBox Grid.Column="1" Margin="10,10,10,10" Text="{x:Bind BindingContext.FindValue, Mode=TwoWay}"/>
                     </Grid>
 
-                    <Grid x:Name="RegexGrid" Grid.Row="0" Grid.Column="0" Visibility="Collapsed">
+                    <Grid x:Name="RegexGrid" Grid.Row="0" Grid.Column="0" 
+                          Visibility="{x:Bind RadioButtonContext.IsFindByRegex, Mode=OneWay}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />

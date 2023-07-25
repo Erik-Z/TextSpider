@@ -29,7 +29,7 @@ namespace TextSpider.ViewModels
             }
         }
 
-        private string _findValue;
+        private string _findValue = "";
         public string FindValue
         {
             get { return _findValue; }

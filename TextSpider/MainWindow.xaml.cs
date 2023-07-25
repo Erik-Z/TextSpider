@@ -36,7 +36,7 @@ using System.Text.RegularExpressions;
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 // TODO: Add file filter for files.
 // TODO: Refactor code to different files.
-// TODO: Add regular expression.
+// TODO: Add error handling for null find value or null regex.
 // TODO: Add replace function.
 // TODO: Implement sorting for datagrid.
 // TODO: Add more file filters for pick single file.
@@ -46,6 +46,7 @@ namespace TextSpider
     {
         MainViewModel BindingContext { get; set; }
         FileService FileService { get; set; }
+        RadioButtonViewModel RadioButtonContext = RadioButtonViewModel.Instance;
         private IDialogService DialogService;
         public MainWindow()
         {
@@ -78,7 +79,7 @@ namespace TextSpider
                 } else
                 {
                     StorageFile file = await StorageFile.GetFileFromPathAsync(BindingContext.InputFilePath);
-                    if (BindingContext.IsFindByRegex)
+                    if (RadioButtonViewModel.Instance.IsFindByRegex)
                     {
                         await MatchRegexPatternInFile(file, BindingContext.GetRegexValue());
                     }
@@ -111,28 +112,7 @@ namespace TextSpider
             }
         }
 
-        private void HandleFindReplaceOptionsChange(object sender, RoutedEventArgs e)
-        {
-            if (FindGrid == null || RegexGrid == null) return;
-
-            RadioButton radioButton = (RadioButton)sender;
-            string selectedOption = radioButton.Name.ToString();
-
-            if (selectedOption == "FindRadioButton")
-            {
-                FindGrid.Visibility = Visibility.Visible;
-                RegexGrid.Visibility = Visibility.Collapsed;
-                BindingContext.IsFindByRegex = false;
-            }
-            else if (selectedOption == "RegexRadioButton")
-            {
-                FindGrid.Visibility = Visibility.Collapsed;
-                RegexGrid.Visibility = Visibility.Visible;
-                BindingContext.IsFindByRegex = true;
-            }
-        }
-
-        private async void ReplaceValueInFilePath(object sender, RoutedEventArgs e)
+        private void ReplaceValueInFilePath(object sender, RoutedEventArgs e)
         {
 
         }
@@ -143,7 +123,7 @@ namespace TextSpider
             var files = await folder.GetFilesAsync();
             foreach (var file in files)
             {
-                if (BindingContext.IsFindByRegex)
+                if (RadioButtonViewModel.Instance.IsFindByRegex)
                 {
                     await MatchRegexPatternInFile(file, BindingContext.GetRegexValue());
                 } else
