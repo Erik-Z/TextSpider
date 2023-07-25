@@ -46,7 +46,7 @@ namespace TextSpider
     {
         MainViewModel BindingContext { get; set; }
         FileService FileService { get; set; }
-        RadioButtonViewModel RadioButtonContext = RadioButtonViewModel.Instance;
+        FindReplaceViewModel RadioButtonContext = FindReplaceViewModel.Instance;
         private IDialogService DialogService;
         public MainWindow()
         {
@@ -79,13 +79,13 @@ namespace TextSpider
                 } else
                 {
                     StorageFile file = await StorageFile.GetFileFromPathAsync(BindingContext.InputFilePath);
-                    if (RadioButtonViewModel.Instance.IsFindByRegex)
+                    if (FindReplaceViewModel.Instance.IsFindByRegex)
                     {
-                        await MatchRegexPatternInFile(file, BindingContext.GetRegexValue());
+                        await MatchRegexPatternInFile(file, new Regex(FindReplaceViewModel.Instance.RegexValue));
                     }
                     else
                     {
-                        await FindValueInFile(file, BindingContext.FindValue);
+                        await FindValueInFile(file, FindReplaceViewModel.Instance.FindValue);
                     }
                 }
                 if (BindingContext.SearchResults.Count == 1)
@@ -123,12 +123,12 @@ namespace TextSpider
             var files = await folder.GetFilesAsync();
             foreach (var file in files)
             {
-                if (RadioButtonViewModel.Instance.IsFindByRegex)
+                if (FindReplaceViewModel.Instance.IsFindByRegex)
                 {
-                    await MatchRegexPatternInFile(file, BindingContext.GetRegexValue());
+                    await MatchRegexPatternInFile(file, new Regex(FindReplaceViewModel.Instance.RegexValue));
                 } else
                 {
-                    await FindValueInFile(file, BindingContext.FindValue);
+                    await FindValueInFile(file, FindReplaceViewModel.Instance.FindValue);
                 }
                 
             }

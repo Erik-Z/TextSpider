@@ -13,9 +13,9 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Components\FileInput.xaml" />
+    <None Remove="Components\FindReplaceInputs.xaml" />
     <None Remove="Components\Menu.xaml" />
     <None Remove="Components\Sidebar.xaml" />
-    <None Remove="Components\StandardRegexRadioButtons.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -65,7 +65,7 @@
     <Resource Remove="Components\Sidebar.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Components\StandardRegexRadioButtons.xaml">
+    <Page Update="Components\FindReplaceInputs.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

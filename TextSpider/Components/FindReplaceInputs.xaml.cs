@@ -19,9 +19,10 @@ using Windows.Foundation.Collections;
 
 namespace TextSpider.Components
 {
-    public sealed partial class StandardRegexRadioButtons : UserControl
+    public sealed partial class FindReplaceInputs : UserControl
     {
-        public StandardRegexRadioButtons()
+        FindReplaceViewModel FindReplaceBindingContext = FindReplaceViewModel.Instance;
+        public FindReplaceInputs()
         {
             this.InitializeComponent();
         }
@@ -33,14 +34,14 @@ namespace TextSpider.Components
 
             if (selectedOption == "FindRadioButton")
             {
-                RadioButtonViewModel.Instance.IsFindByRegex = false;
+                FindReplaceViewModel.Instance.IsFindByRegex = false;
             }
             else if (selectedOption == "RegexRadioButton")
             {
 
-                RadioButtonViewModel.Instance.IsFindByRegex = true;
+                FindReplaceViewModel.Instance.IsFindByRegex = true;
             }
-            RadioButtonViewModel.Instance.IsNotFindByRegex = !RadioButtonViewModel.Instance.IsFindByRegex;
+            FindReplaceViewModel.Instance.IsNotFindByRegex = !FindReplaceViewModel.Instance.IsFindByRegex;
         }
     }
 }

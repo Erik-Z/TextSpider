@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="TextSpider.Components.FindReplaceInputs"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TextSpider.Components"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <RadioButton Content="Standard" 
+                                     GroupName="FindReplaceOptions" 
+                                     Name="FindRadioButton"
+                                     IsChecked="True"
+                                     Checked="HandleFindReplaceOptionsChange"
+                                     Margin="10,20,10,0"/>
+
+            <RadioButton Content="Regular Expression" 
+                                     GroupName="FindReplaceOptions"
+                                     Name="RegexRadioButton"
+                                     Checked="HandleFindReplaceOptionsChange"
+                                     Margin="10,20,10,0"/>
+        </StackPanel>
+    
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="200" />
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="FindGrid" Grid.Row="0" Grid.Column="0"
+                              Visibility="{x:Bind FindReplaceBindingContext.IsNotFindByRegex, Mode=OneWay}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="Find:" Margin="10,10,10,10" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Margin="10,10,10,10" Text="{x:Bind FindReplaceBindingContext.FindValue, Mode=TwoWay}"/>
+            </Grid>
+
+            <Grid x:Name="RegexGrid" Grid.Row="0" Grid.Column="0" 
+                              Visibility="{x:Bind FindReplaceBindingContext.IsFindByRegex, Mode=OneWay}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="RegEx:" Margin="10,10,10,10" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Margin="10,10,10,10" Text="{x:Bind FindReplaceBindingContext.RegexValue, Mode=TwoWay}"/>
+            </Grid>
+
+            <Grid x:Name="ReplaceGrid" Grid.Row="1" Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="Replace:" Margin="10,10,10,10" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Margin="10,10,10,10" Text="{x:Bind FindReplaceBindingContext.ReplaceValue, Mode=TwoWay}"/>
+            </Grid>
+
+            <StackPanel Grid.RowSpan="2" Grid.Column="2">
+                <TextBlock  Text="Stuff " Margin="10,10,10,10" VerticalAlignment="Center"/>
+                <TextBlock  Text="Stuff " Margin="10,10,10,10" VerticalAlignment="Center"/>
+                <TextBlock  Text="Stuff " Margin="10,10,10,10" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+    </StackPanel>
+</UserControl>
