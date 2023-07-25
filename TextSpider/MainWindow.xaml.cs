@@ -46,7 +46,6 @@ namespace TextSpider
     {
         MainViewModel BindingContext { get; set; }
         FileService FileService { get; set; }
-        FindReplaceViewModel RadioButtonContext = FindReplaceViewModel.Instance;
         private IDialogService DialogService;
         public MainWindow()
         {
