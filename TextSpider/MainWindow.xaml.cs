@@ -30,24 +30,25 @@ using TextSpider.Models;
 using TextSpider.Interfaces;
 using TextSpider.Components;
 using System.Text.RegularExpressions;
+using Windows.Foundation.Diagnostics;
 
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
-// TODO: Add confirmation dialog to dialog services
 // TODO: Add file filter for files.
 // TODO: Refactor code to different files.
 // TODO: Add error handling for null find value or null regex.
 // TODO: Add replace function.
 // TODO: Implement sorting for datagrid.
 // TODO: Add more file filters for pick single file.
+// TODO: Implement multiple selected. (This includes replacing values at the same time.)
 namespace TextSpider
 {
     public partial class MainWindow : Window
     {
         MainViewModel BindingContext { get; set; }
         FileService FileService { get; set; }
-        private IDialogService DialogService;
+        private DialogService DialogService;
         public MainWindow()
         {
             this.InitializeComponent();
@@ -112,9 +113,16 @@ namespace TextSpider
             }
         }
 
-        private void ReplaceValueInFilePath(object sender, RoutedEventArgs e)
+        private async void ReplaceValueInFilePath(object sender, RoutedEventArgs e)
         {
-
+            try { 
+            string originalValue = FindReplaceViewModel.Instance.IsFindByRegex ? 
+                FindReplaceViewModel.Instance.RegexValue : FindReplaceViewModel.Instance.FindValue;
+            string str = ReplaceResultsWithValue(originalValue, FindReplaceViewModel.Instance.ReplaceValue);
+            } catch (Exception)
+            {
+                await DialogService.ShowGenericErrorDialogAsync();
+            }
         }
 
         #region Helpers
@@ -241,6 +249,14 @@ namespace TextSpider
                 Results = str.ToString()
             };
             BindingContext.SearchResults.Add(fileInformation);
+        }
+
+        private string ReplaceResultsWithValue(string value, string newValue)
+        {
+            string plainText;
+            ResultsRichEditBox.TextDocument.GetText(TextGetOptions.None, out plainText);
+            string finalText = plainText.Replace(value, newValue);
+            return finalText;
         }
         #endregion
     }

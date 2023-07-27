@@ -51,5 +51,18 @@ namespace TextSpider.Services
                 confirmationAction();
             }
         }
+
+        public async Task ShowGenericErrorDialogAsync()
+        {
+            dialog = new ContentDialog()
+            {
+                Title = "Error",
+                Content = "Something went wrong. Please try again later.",
+                CloseButtonText = "Ok",
+                XamlRoot = xamlRoot
+            };
+
+            await dialog.ShowAsync();
+        }
     }
 }
