@@ -8,13 +8,13 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <MenuBar>
+    <MenuBar x:Name="MainMenu" Loaded="HandleMenuLoaded">
         <MenuBarItem Title="File">
             <MenuFlyoutItem Text="New"/>
             <MenuFlyoutItem Text="Open..." />
             <MenuFlyoutItem Text="Save" />
             <MenuFlyoutSeparator />
-            <MenuFlyoutItem Text="Exit"/>
+            <MenuFlyoutItem Text="Exit" Click="HandleExitClicked"/>
         </MenuBarItem>
         <MenuBarItem Title="View">
             <!-- Add your menu items here -->

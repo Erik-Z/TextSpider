@@ -31,5 +31,25 @@ namespace TextSpider.Services
 
             await dialog.ShowAsync();
         }
+
+        public async Task ShowConfirmationDialogAsync(string title, string message, string confirmButtonText, 
+            Action confirmationAction)
+        {
+            ContentDialog deleteFileDialog = new ContentDialog
+            {
+                Title = title,
+                Content = message,
+                PrimaryButtonText = confirmButtonText,
+                CloseButtonText = "Cancel",
+                XamlRoot = xamlRoot
+            };
+
+            ContentDialogResult result = await deleteFileDialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                confirmationAction();
+            }
+        }
     }
 }

@@ -34,6 +34,7 @@ using System.Text.RegularExpressions;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
+// TODO: Add confirmation dialog to dialog services
 // TODO: Add file filter for files.
 // TODO: Refactor code to different files.
 // TODO: Add error handling for null find value or null regex.
