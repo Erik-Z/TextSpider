@@ -55,7 +55,7 @@
             </Grid.RowDefinitions>
             <ctWinUI:DataGrid Grid.Row="0" Height="200" AutoGenerateColumns="False" IsReadOnly="True"
                               ItemsSource="{x:Bind BindingContext.SearchResults, Mode=OneWay}" 
-                              SelectionMode="Single" SelectionChanged="HandleSelectedResultChange">
+                              SelectionMode="Single" SelectionChanged="HandleSelectedResultChange" x:Name="ResultsDataGrid">
                 <ctWinUI:DataGrid.Columns>
                     <ctWinUI:DataGridTextColumn Header="File Name" Width="SizeToHeader" 
                                                 Binding="{Binding FileName}" />

@@ -31,6 +31,7 @@ using TextSpider.Interfaces;
 using TextSpider.Components;
 using System.Text.RegularExpressions;
 using Windows.Foundation.Diagnostics;
+using Windows.Storage.Streams;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -42,6 +43,8 @@ using Windows.Foundation.Diagnostics;
 // TODO: Implement sorting for datagrid.
 // TODO: Add more file filters for pick single file.
 // TODO: Implement multiple selected. (This includes replacing values at the same time.)
+// TODO: Do a find then replace if only replace is clicked.
+// TODO: Fix how it handles the content in rich text box after replacement.
 namespace TextSpider
 {
     public partial class MainWindow : Window
@@ -118,8 +121,8 @@ namespace TextSpider
             try { 
             string originalValue = FindReplaceViewModel.Instance.IsFindByRegex ? 
                 FindReplaceViewModel.Instance.RegexValue : FindReplaceViewModel.Instance.FindValue;
-            string str = ReplaceResultsWithValue(originalValue, FindReplaceViewModel.Instance.ReplaceValue);
-            } catch (Exception)
+            string str = await ReplaceResultsWithValueAsync(originalValue, FindReplaceViewModel.Instance.ReplaceValue);
+            } catch (Exception ex)
             {
                 await DialogService.ShowGenericErrorDialogAsync();
             }
@@ -162,9 +165,10 @@ namespace TextSpider
                 if (!line.Contains(value) || value == "") continue;
                 matches++;
 
-                str.Append(@"\tab\cf1\highlight0 ");
+                str.Append(@"\tab\cf5\highlight4 ");
                 str.Append((i + 1).ToString());
                 str.Append("\t");
+                str.Append(@"\cf1\highlight0 ");
 
                 int start = 0;
                 int found = -1;
@@ -192,8 +196,9 @@ namespace TextSpider
                 Created = properties.ItemDate,
                 Modified = properties.DateModified,
                 Attributes = file.Attributes.ToString(),
-                Results = str.ToString()
-            };
+                Results = str.ToString(),
+                AccessStorageToken = Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Add(file)
+        };
             BindingContext.SearchResults.Add(fileInformation);
         }
 
@@ -251,12 +256,38 @@ namespace TextSpider
             BindingContext.SearchResults.Add(fileInformation);
         }
 
-        private string ReplaceResultsWithValue(string value, string newValue)
-        {
-            string plainText;
-            ResultsRichEditBox.TextDocument.GetText(TextGetOptions.None, out plainText);
-            string finalText = plainText.Replace(value, newValue);
-            return finalText;
+        private async Task<string> ReplaceResultsWithValueAsync(string value, string newValue)
+        {   
+            foreach(FileInformation fileInfo in ResultsDataGrid.SelectedItems.Count == 0 ? ResultsDataGrid.ItemsSource : ResultsDataGrid.SelectedItems)
+            {
+                StorageFile file = await Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.GetFileAsync(fileInfo.AccessStorageToken);
+                string text = await FileIO.ReadTextAsync(file);
+                if (FindReplaceViewModel.Instance.IsFindByRegex)
+                {
+                    text = new Regex(value).Replace(text, newValue);
+                } else
+                {
+                    text = text.Replace(value, newValue);
+                }
+                
+                var stream = await file.OpenAsync(FileAccessMode.ReadWrite);
+                using (var outputStream = stream.GetOutputStreamAt(0))
+                {
+                    using (var dataWriter = new DataWriter(outputStream))
+                    {
+                        dataWriter.WriteString(text);
+                        await dataWriter.StoreAsync();
+                        await outputStream.FlushAsync();
+                    }
+                    
+                }
+                
+                
+                stream.Dispose();
+            }
+
+
+            return "";
         }
         #endregion
     }

@@ -18,5 +18,6 @@ namespace TextSpider.Models
         public string Encoding { get; set; }
         public string Attributes { get; set; }
         public string Results { get; set; }
+        public string AccessStorageToken { get; set; }
     }
 }
