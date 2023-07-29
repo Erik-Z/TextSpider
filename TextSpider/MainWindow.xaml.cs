@@ -45,12 +45,14 @@ using Windows.Storage.Streams;
 // TODO: Implement multiple selected. (This includes replacing values at the same time.)
 // TODO: Do a find then replace if only replace is clicked.
 // TODO: Fix how it handles the content in rich text box after replacement.
+// TODO: Make file replacement multi process.
+// TODO: Automatically select first file after Find on folder.
+
 namespace TextSpider
 {
     public partial class MainWindow : Window
     {
         MainViewModel BindingContext { get; set; }
-        FileService FileService { get; set; }
         private DialogService DialogService;
         public MainWindow()
         {
@@ -62,8 +64,6 @@ namespace TextSpider
             Sidebar.BindingContext = BindingContext;
             FileInput.BindingContext = BindingContext;
             FileInput.window = this;
-
-            FileService = new FileService();
         }
         private void HandleMainWindowLoaded(object sender, RoutedEventArgs e)
         {
@@ -85,7 +85,7 @@ namespace TextSpider
                     StorageFile file = await StorageFile.GetFileFromPathAsync(BindingContext.InputFilePath);
                     if (FindReplaceViewModel.Instance.IsFindByRegex)
                     {
-                        await MatchRegexPatternInFile(file, new Regex(FindReplaceViewModel.Instance.RegexValue));
+                        await FindValueInFile(file, new Regex(FindReplaceViewModel.Instance.RegexValue));
                     }
                     else
                     {
@@ -119,10 +119,39 @@ namespace TextSpider
         private async void ReplaceValueInFilePath(object sender, RoutedEventArgs e)
         {
             try { 
-            string originalValue = FindReplaceViewModel.Instance.IsFindByRegex ? 
-                FindReplaceViewModel.Instance.RegexValue : FindReplaceViewModel.Instance.FindValue;
-            string str = await ReplaceResultsWithValueAsync(originalValue, FindReplaceViewModel.Instance.ReplaceValue);
-            } catch (Exception ex)
+                string originalValue = FindReplaceViewModel.Instance.IsFindByRegex ? 
+                    FindReplaceViewModel.Instance.RegexValue : FindReplaceViewModel.Instance.FindValue;
+
+                foreach (FileInformation fileInfo in ResultsDataGrid.SelectedItems.Count == 0 ? ResultsDataGrid.ItemsSource : ResultsDataGrid.SelectedItems)
+                {
+                    StorageFile file = await Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.GetFileAsync(fileInfo.AccessStorageToken);
+                    StorageFile backupFile = await file.CopyAsync(await file.GetParentAsync(), file.Name + ".backup", NameCollisionOption.ReplaceExisting);
+
+                    string text = await FileIO.ReadTextAsync(file);
+                    if (FindReplaceViewModel.Instance.IsFindByRegex)
+                    {
+                        text = new Regex(originalValue).Replace(text, FindReplaceViewModel.Instance.ReplaceValue);
+                        UpdateResultsWithNewValue(new Regex(originalValue), FindReplaceViewModel.Instance.ReplaceValue);
+                    }
+                    else
+                    {
+                        text = text.Replace(originalValue, FindReplaceViewModel.Instance.ReplaceValue);
+                        UpdateResultsWithNewValue(originalValue, FindReplaceViewModel.Instance.ReplaceValue);
+                    }
+
+                    try
+                    {
+                        await FileIO.WriteTextAsync(file, text);
+                    } 
+                    catch (Exception)
+                    {
+                        await backupFile.CopyAsync(await file.GetParentAsync(), file.Name, NameCollisionOption.ReplaceExisting);
+                        await DialogService.ShowGenericErrorDialogAsync();
+                    }
+                }
+                await DialogService.ShowDialogAsync("Confirmation", "Successfully replaced text in selected file(s).", "Ok");
+            } 
+            catch (Exception)
             {
                 await DialogService.ShowGenericErrorDialogAsync();
             }
@@ -136,7 +165,7 @@ namespace TextSpider
             {
                 if (FindReplaceViewModel.Instance.IsFindByRegex)
                 {
-                    await MatchRegexPatternInFile(file, new Regex(FindReplaceViewModel.Instance.RegexValue));
+                    await FindValueInFile(file, new Regex(FindReplaceViewModel.Instance.RegexValue));
                 } else
                 {
                     await FindValueInFile(file, FindReplaceViewModel.Instance.FindValue);
@@ -202,7 +231,7 @@ namespace TextSpider
             BindingContext.SearchResults.Add(fileInformation);
         }
 
-        private async Task MatchRegexPatternInFile(StorageFile file, Regex pattern)
+        private async Task FindValueInFile(StorageFile file, Regex pattern)
         {
             IList<string> lines = await FileIO.ReadLinesAsync(file);
             StringBuilder str = new StringBuilder();
@@ -256,38 +285,20 @@ namespace TextSpider
             BindingContext.SearchResults.Add(fileInformation);
         }
 
-        private async Task<string> ReplaceResultsWithValueAsync(string value, string newValue)
-        {   
-            foreach(FileInformation fileInfo in ResultsDataGrid.SelectedItems.Count == 0 ? ResultsDataGrid.ItemsSource : ResultsDataGrid.SelectedItems)
+        private void UpdateResultsWithNewValue(string oldValue, string newValue)
+        {
+            foreach (FileInformation fileInfo in BindingContext.SearchResults)
             {
-                StorageFile file = await Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.GetFileAsync(fileInfo.AccessStorageToken);
-                string text = await FileIO.ReadTextAsync(file);
-                if (FindReplaceViewModel.Instance.IsFindByRegex)
-                {
-                    text = new Regex(value).Replace(text, newValue);
-                } else
-                {
-                    text = text.Replace(value, newValue);
-                }
-                
-                var stream = await file.OpenAsync(FileAccessMode.ReadWrite);
-                using (var outputStream = stream.GetOutputStreamAt(0))
-                {
-                    using (var dataWriter = new DataWriter(outputStream))
-                    {
-                        dataWriter.WriteString(text);
-                        await dataWriter.StoreAsync();
-                        await outputStream.FlushAsync();
-                    }
-                    
-                }
-                
-                
-                stream.Dispose();
+                fileInfo.Results = fileInfo.Results.Replace(oldValue, newValue);
             }
+        }
 
-
-            return "";
+        private void UpdateResultsWithNewValue(Regex oldRegex, string newValue)
+        {
+            foreach (FileInformation fileInfo in BindingContext.SearchResults)
+            {
+                fileInfo.Results = oldRegex.Replace(fileInfo.Results, newValue);
+            }
         }
         #endregion
     }
