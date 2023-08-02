@@ -44,21 +44,27 @@
         </Grid>
 
         <Grid x:Name="FolderInputGrid" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="0" Text="Start Location:" Margin="10,10,10,10" VerticalAlignment="Center"/>
-            <TextBox Grid.Column="1" x:Name="FolderNameTextBox" Margin="10,10,10,10" Text="{x:Bind BindingContext.InputFilePath, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Start Location:" Margin="10,10,10,10" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="0" Grid.Column="1" x:Name="FolderNameTextBox" Margin="10,10,10,10" Text="{x:Bind BindingContext.InputFilePath, Mode=TwoWay}"/>
             <!--  ActualHeight is probably stuck at collapsed height. (Figure out how to fix later)-->
-            <Button Grid.Column="2" 
+            <Button Grid.Row="0" Grid.Column="2" 
                                 Height="{Binding ElementName=FileNameTextBox, Path=ActualHeight}"
                                 Margin="10,10,10,10"
                                 Click="LoadFolderFromFileExplorer">
                 <Image Source="ms-appx:///Assets/folder.png" Stretch="UniformToFill" />
             </Button>
+            
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Exclude:" Margin="10,10,10,10" VerticalAlignment="Center"/>
         </Grid>
     </StackPanel>
 </UserControl>

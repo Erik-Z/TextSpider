@@ -36,17 +36,21 @@ using Windows.Storage.Streams;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
+// TODO: Handle find for unicode and other encodings
 // TODO: Add file filter for files.
 // TODO: Refactor code to different files.
 // TODO: Add error handling for null find value or null regex.
-// TODO: Add replace function.
+// TODO: Add error handling for null replace.
 // TODO: Implement sorting for datagrid.
 // TODO: Add more file filters for pick single file.
 // TODO: Implement multiple selected. (This includes replacing values at the same time.)
-// TODO: Do a find then replace if only replace is clicked.
+// TODO: Do a find then replace if only replace is clicked. (Find is not clicked beforehand)
 // TODO: Fix how it handles the content in rich text box after replacement.
 // TODO: Make file replacement multi process.
 // TODO: Automatically select first file after Find on folder.
+// TODO: In folder filter, allow users to create and delete file types.
+// TODO: Add unit tests.
+// TODO: Auto select in datagrid when find happens. Just use selected when replacing.
 
 namespace TextSpider
 {
@@ -97,7 +101,7 @@ namespace TextSpider
                     ResultsRichEditBox.Document.SetText(TextSetOptions.FormatRtf, BindingContext.SearchResults[0].Results);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 await DialogService.ShowDialogAsync(
                     "Invalid File Path",
@@ -108,12 +112,11 @@ namespace TextSpider
 
         private void HandleSelectedResultChange(object sender, RoutedEventArgs e)
         {
-            if (sender is DataGrid dataGrid)
-            {
-                FileInformation selectedItem = (FileInformation)dataGrid.SelectedItem;
-                if (selectedItem == null) return;
-                ResultsRichEditBox.Document.SetText(TextSetOptions.FormatRtf, selectedItem.Results);
-            }
+            if (sender is not DataGrid dataGrid) return;
+            
+            FileInformation selectedItem = (FileInformation)dataGrid.SelectedItem;
+            if (selectedItem == null) return;
+            ResultsRichEditBox.Document.SetText(TextSetOptions.FormatRtf, selectedItem.Results);
         }
 
         private async void ReplaceValueInFilePath(object sender, RoutedEventArgs e)
