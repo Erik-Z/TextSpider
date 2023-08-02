@@ -57,7 +57,7 @@
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Start Location:" Margin="10,10,10,10" VerticalAlignment="Center"/>
             <TextBox Grid.Row="0" Grid.Column="1" x:Name="FolderNameTextBox" Margin="10,10,10,10" Text="{x:Bind BindingContext.InputFilePath, Mode=TwoWay}"/>
             <!--  ActualHeight is probably stuck at collapsed height. (Figure out how to fix later)-->
-            <Button Grid.Row="0" Grid.Column="2" 
+            <Button Grid.Row="0" Grid.Column="2" x:Name="OpenFileButton" 
                                 Height="{Binding ElementName=FileNameTextBox, Path=ActualHeight}"
                                 Margin="10,10,10,10"
                                 Click="LoadFolderFromFileExplorer">
